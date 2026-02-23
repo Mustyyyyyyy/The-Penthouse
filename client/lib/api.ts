@@ -1,50 +1,90 @@
-import { api } from "./axios";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-export const loginAdmin = async (email: string, password: string) => {
-  const res = await api.post("/auth/login", { email, password });
-  return res.data;
-};
+type Method = "GET" | "POST" | "PUT" | "DELETE";
 
-export const getProfile = async () => {
-  const res = await api.get("/auth/profile");
-  return res.data;
-};
+interface ApiError {
+  status?: number;
+  message?: string;
+  msg?: string;
+}
 
-export const getAllApartments = async () => (await api.get("/apartments")).data;
+export async function apiFetch(
+  endpoint: string,
+  data: any = null,
+  method: Method = "GET"
+) {
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-export const getApartment = async (id: string | number) =>
-  (await api.get(`/apartments/${id}`)).data;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
 
-export const createApartment = async (data: any) =>
-  (await api.post("/apartments", data)).data;
+  if (token) headers.Authorization = `Bearer ${token}`;
 
-export const updateApartment = async (id: string | number, data: any) =>
-  (await api.put(`/apartments/${id}`, data)).data;
+  const config: RequestInit = {
+    method,
+    headers,
+  };
 
-export const deleteApartment = async (id: string | number) =>
-  (await api.delete(`/apartments/${id}`)).data;
+  if (data && method !== "GET") {
+    config.body = JSON.stringify(data);
+  }
 
-export const toggleApartmentAvailability = async (
-  id: string | number,
-  available: boolean
-) => (await api.put(`/apartments/${id}/availability`, { available })).data;
+  try {
+    const res = await fetch(`${BASE_URL}${endpoint}`, config);
 
-export const getAllUsers = async () => (await api.get("/users")).data;
+    const contentType = res.headers.get("content-type");
+    const isJson = contentType?.includes("application/json");
 
-export const getUser = async (id: string | number) =>
-  (await api.get(`/users/${id}`)).data;
+    const responseData = isJson ? await res.json() : null;
 
-export const login = async (email: string, password: string) => {
-  const res = await api.post("/auth/login", { email, password });
-  return res.data; // expects { token, user }
-};
+    if (!res.ok) {
+      const error: ApiError = responseData || {};
+      throw new Error(error.msg || error.message || "Request failed");
+    }
 
-export const signup = async (payload: {
+    return responseData;
+  } catch (err: any) {
+    console.error("API ERROR:", err.message);
+    throw new Error(err.message || "Network error");
+  }
+}
+
+
+export const signup = (data: {
   fullName: string;
   email: string;
   password: string;
   phone?: string;
-}) => {
-  const res = await api.post("/auth/register", payload);
-  return res.data; // expects { token, user }
-};
+}) => apiFetch("/auth/register", data, "POST");
+
+export const login = (data: { email: string; password: string }) =>
+  apiFetch("/auth/login", data, "POST");
+
+export const getProfile = () => apiFetch("/auth/profile");
+
+   
+
+export const getAllApartments = () => apiFetch("/apartments");
+
+export const getApartment = (id: string) =>
+  apiFetch(`/apartments/${id}`);
+
+export const createApartment = (data: any) =>
+  apiFetch("/apartments", data, "POST");
+
+export const updateApartment = (id: string, data: any) =>
+  apiFetch(`/apartments/${id}`, data, "PUT");
+
+export const deleteApartment = (id: string) =>
+  apiFetch(`/apartments/${id}`, null, "DELETE");
+
+export const toggleApartmentAvailability = (id: string, available: boolean) =>
+  apiFetch(`/apartments/${id}/availability`, { available }, "PUT");
+
+
+
+export const getAllUsers = () => apiFetch("/users");
+export const getUser = (id: string) => apiFetch(`/users/${id}`);

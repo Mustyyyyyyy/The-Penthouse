@@ -17,6 +17,10 @@ app.use(
   })
 );
 
+app.get("", (req, res) => {
+  res.send("Welcome to the Apartment Management System API");
+});
+
 app.options("", cors());
 
 app.use(express.json());
