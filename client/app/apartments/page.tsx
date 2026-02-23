@@ -27,14 +27,12 @@ const FALLBACKS = [
   "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1600&q=80",
   "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1600&q=80",
   "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1600&q=80",
-  "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?auto=format&fit=crop&w=1600&q=80",
-  "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80",
   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
 ];
 
 function pickCardImage(apt: Apartment) {
   const first = apt.images?.[0];
-  if (first && String(first).trim().length > 0) return first;
+  if (first && first.trim()) return first;
 
   const sum = (apt._id || "")
     .split("")
@@ -79,7 +77,7 @@ export default function ApartmentsPage() {
 
   const availableCount = useMemo(
     () => apartments.filter((a) => a.available !== false).length,
-    [apartments]
+    [apartments],
   );
 
   if (loading) {
@@ -211,7 +209,9 @@ export default function ApartmentsPage() {
                     <span className="text-sm text-gray-500">/ Night</span>
                   </p>
 
-                  <p className="text-sm text-gray-600 mt-1">{apt.rooms} Rooms</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {apt.rooms} Rooms
+                  </p>
 
                   <div className="mt-auto flex flex-col gap-3 pt-6">
                     <Link
@@ -221,14 +221,23 @@ export default function ApartmentsPage() {
                       View Details
                     </Link>
 
-                    <a
-                      href={waLink(message)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="border border-emerald-600 text-emerald-700 text-center py-2.5 rounded-lg hover:bg-emerald-50 font-semibold"
-                    >
-                      Book on WhatsApp
-                    </a>
+                    {apt.available ? (
+                      <a
+                        href={waLink(message)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="border border-green-600 text-green-700 text-center py-2 rounded hover:bg-green-50 font-semibold"
+                      >
+                        Book on WhatsApp
+                      </a>
+                    ) : (
+                      <button
+                        disabled
+                        className="border border-gray-300 text-gray-400 text-center py-2 rounded font-semibold cursor-not-allowed"
+                      >
+                        Booked — Not Available
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -237,7 +246,8 @@ export default function ApartmentsPage() {
         </div>
 
         <p className="text-xs text-gray-500 mt-10">
-          Tip: Add 3–6 unique images per apartment in Admin to make listings look premium.
+          Tip: Add 3–6 unique images per apartment in Admin to make listings
+          look premium.
         </p>
       </div>
     </main>

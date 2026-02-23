@@ -106,9 +106,7 @@ export default function ApartmentDetailsPage() {
 
   if (!apt) {
     return (
-      <div className="p-20 text-center text-gray-600">
-        Apartment not found.
-      </div>
+      <div className="p-20 text-center text-gray-600">Apartment not found.</div>
     );
   }
 
@@ -226,7 +224,9 @@ export default function ApartmentDetailsPage() {
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm text-gray-600">Check-in (optional)</label>
+              <label className="text-sm text-gray-600">
+                Check-in (optional)
+              </label>
               <input
                 type="date"
                 value={checkIn}
@@ -235,7 +235,9 @@ export default function ApartmentDetailsPage() {
               />
             </div>
             <div>
-              <label className="text-sm text-gray-600">Check-out (optional)</label>
+              <label className="text-sm text-gray-600">
+                Check-out (optional)
+              </label>
               <input
                 type="date"
                 value={checkOut}
@@ -244,7 +246,9 @@ export default function ApartmentDetailsPage() {
               />
             </div>
             <div>
-              <label className="text-sm text-gray-600">Your Name (optional)</label>
+              <label className="text-sm text-gray-600">
+                Your Name (optional)
+              </label>
               <input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -263,17 +267,27 @@ export default function ApartmentDetailsPage() {
             </div>
           </div>
 
-          <a
-            href={waLink(whatsappMessage)}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-4 inline-block w-full bg-green-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-green-700"
-          >
-            Book on WhatsApp
-          </a>
+          {apt.available ? (
+            <a
+              href={waLink(whatsappMessage)}
+              target="_blank"
+              rel="noreferrer"
+              className="border border-green-600 text-green-700 text-center py-2 rounded hover:bg-green-50 font-semibold"
+            >
+              Book on WhatsApp
+            </a>
+          ) : (
+            <button
+              disabled
+              className="border border-gray-300 text-gray-400 text-center py-2 rounded font-semibold cursor-not-allowed"
+            >
+              Booked — Not Available
+            </button>
+          )}
 
           <p className="text-xs text-gray-500 mt-3">
-            You’ll be redirected to WhatsApp with your booking details already typed.
+            You’ll be redirected to WhatsApp with your booking details already
+            typed.
           </p>
         </div>
       </div>
